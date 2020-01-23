@@ -5,4 +5,6 @@ category: dtk-2.3
 permalink: /dtk-2.3/chap1
 ---
 
-Chapter #1
+# Scaling Pods with ReplicaSets
+
+* Replicaset is a Controller. Sole purpose is 
