@@ -14,13 +14,13 @@ permalink: /dtk-2.3/chap1
 
 ## Creating a ReplicaSet
 ```
-apiVersion:  apps/v1
-kind: ReplicaSet
-metadata:
+apiVersion:  apps/v1 # Mandatory with all Kubernetes Objects
+kind: ReplicaSet     # Mandatory with all Kubernetes Objects - and this time it is ReplicaSet instead of a Pod
+metadata:            # Mandatory with all Kubernetes Objects - This is key value pair for informational purpose only. Doesn't affect behavior. 
   name: go-demo-2
 spec:
-  replicas: 2
-  selector:
+  replicas: 2       # defaults to 1. Specifying 2 means two Pods would be run concurrently.
+  selector:         # This selects which Pods should be included in this ReplicaSet. It doesn't distinguish between Pods created by a ReplicaSet or                     someother process. That way ReplicaSet and Pods are decoupled. If the Pods matching the ReplicaSet selector already exists.                       ReplicaSet would do nothing. It would monitor for desired state, if not avaibale will converge to it.
     matchLabels:
       type: backend
       service: go-demo-2
