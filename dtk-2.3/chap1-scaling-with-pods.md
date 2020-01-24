@@ -107,3 +107,86 @@ kubectl delete -f rs/go-demo-2.yml --cascade=false
 ```
 
 * cascade=false : Does the trick of only deleting the rs and leaving the pods behind.
+
+Now when we list the Pods, we still find them. So we just deleted the relationship between RS and the Pods.
+
+```
+kubectl get pods
+NAME              READY   STATUS    RESTARTS   AGE
+go-demo-2-c4ccl   2/2     Running   0          31s
+go-demo-2-f5dvh   2/2     Running   0          31s
+```
+
+```
+kubectl create -f rs/go-demo-2.yml --save-config
+```
+save-config: saves the configuration. will be used later.
+
+* Now we created a new ReplicaSet and mapped it with the existing pods. Also we can verify the Pod labels by.
+```
+kubectl get pods --show-labels
+```
+* ***crearte*** vs ***apply*** : Apply saves the configuration automatically, so that we can edit later on. For create we had to use --save-config additionally.
+
+* Scaling the ReplicaSet: Notice the output says configured.
+```
+kubectl apply -f rs/go-demo-2-scaled.yml 
+replicaset.apps/go-demo-2 configured
+```
+* The only difference with go-demo-2 was number of replicas:
+```
+spec:
+  replicas: 4
+```
+* Testing self healing:
+```
+POD_NAME=$(kubectl get pods -o name | tail -1)
+
+kubectl delete $POD_NAME
+pod "go-demo-2-hll8r" deleted
+
+kubectl get pods --show-labels
+NAME              READY   STATUS    RESTARTS   AGE     LABELS
+go-demo-2-95zk8   2/2     Running   0          4m45s   db=mongo,language=go,service=go-demo-2,type=backend
+go-demo-2-c4ccl   2/2     Running   0          13m     db=mongo,language=go,service=go-demo-2,type=backend
+go-demo-2-f5dvh   2/2     Running   0          13m     db=mongo,language=go,service=go-demo-2,type=backend
+go-demo-2-vgkwj   2/2     Running   0          16s     db=mongo,language=go,service=go-demo-2,type=backend
+
+```
+
+* Lets verify the importance of ***labels*** Let’s see what happens if we remove one of the Pod labels ReplicaSet uses in its selector.
+```
+POD_NAME=$(kubectl get pods -o name | tail -1)
+kubectl label $POD_NAME service -
+kubectl describe $POD_NAME
+
+Labels:    
+    db=mongo
+    language=go
+    type=backend
+
+
+kubectl get pods --show-labels
+NAME              READY   STATUS    RESTARTS   AGE     LABELS
+go-demo-2-95zk8   2/2     Running   0          11m     db=mongo,language=go,service=go-demo-2,type=backend
+go-demo-2-c4ccl   2/2     Running   0          20m     db=mongo,language=go,service=go-demo-2,type=backend
+go-demo-2-f5dvh   2/2     Running   0          20m     db=mongo,language=go,service=go-demo-2,type=backend
+go-demo-2-j2x8b   2/2     Running   0          2m25s   db=mongo,language=go,service=go-demo-2,type=backend
+go-demo-2-vgkwj   2/2     Running   0          6m53s   db=mongo,language=go,type=backend
+```
+
+* Notice service label has been removed. And how an New Pod was spun up. Since ReplicaSet found a missing Pod (becoz of no label match), it created one.
+* If we add back the label. Rs would remove the extra Pod.
+```
+kubectl label $POD_NAME service=go-demo-2
+pod/go-demo-2-vgkwj labeled
+
+kubectl get pods --show-labels
+NAME              READY   STATUS    RESTARTS   AGE   LABELS
+go-demo-2-95zk8   2/2     Running   0          15m   db=mongo,language=go,service=go-demo-2,type=backend
+go-demo-2-c4ccl   2/2     Running   0          24m   db=mongo,language=go,service=go-demo-2,type=backend
+go-demo-2-f5dvh   2/2     Running   0          24m   db=mongo,language=go,service=go-demo-2,type=backend
+go-demo-2-vgkwj   2/2     Running   0          10m   db=mongo,language=go,service=go-demo-2,type=backend
+```
+* count is now back to 4.
+* ***ReplicaSets*** are almost never used by themselves. Just as we don't create Pods directly. Instead, we tend to create ReplicaSets through Deployments. In other words, we use ReplicaSets to create and control Pods, and Deployments to create ReplicaSets (and a few other things).
