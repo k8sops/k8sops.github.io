@@ -105,3 +105,5 @@ ReplicaSet is loosely coupled with the Pods. So we can delete just the ReplicaSe
 ```
 kubectl delete -f rs/go-demo-2.yml --cascade=false
 ```
+
+* cascade=false : Does the trick of only deleting the rs and leaving the pods behind.
