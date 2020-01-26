@@ -2,10 +2,10 @@
 layout: page
 title: Kubernetes Basics
 ---
-<li>
+<ul>
 {% for page in site.pages %}
     {% if page.category == "dtk-2.3" %}
-        <a href="{{ page.url }}">{{ page.title }}</a>
+        <li><a href="{{ page.url }}">{{ page.title }}</a></li>
     {% endif %}
 {% endfor %}
-</li>
+</ul>
