@@ -12,10 +12,10 @@ chapter: 2
 * Previous setup in [Scaling with Pods](/dtk-2.3/scaling-with-pods), had a issue. Both the API and DB containers were in the same Pod. That restricts scaling. One cannot scale without the other. And communication was happening via localhost.
 * To split them up, will have to take care of communication.
 * Need for Services:
-.. * We can spilt the API and DB into separate Pods.
-.. * Pods get their own IP address. But since Pods are short lived, their IP adress also cannot be relied on.
-.. * We need a stable never to be changed IP adress that forwards the requests to whichever Pod is currently running and can take the request.
-.. * ***Services*** fulfill that requirement
+    * We can spilt the API and DB into separate Pods.
+    * Pods get their own IP address. But since Pods are short lived, their IP adress also cannot be relied on.
+    * We need a stable never to be changed IP adress that forwards the requests to whichever Pod is currently running and can take the request.
+    * ***Services*** fulfill that requirement
 ```
 - name: db
     image: mongo:3.3
@@ -37,4 +37,8 @@ kubectl expose rs go-demo-2 \
 ```
 
 * We are exposing a ReplicaSet named ***go-demo-2*** and createing the service with name ***go-demo-2-svc*** , port to be exposed is ***28017*** since MongoDb would be listening to it. Type would be ***NodePort***, which means this port would be exposed on every node in the cluster and the request would be routed to one of the Pods controlled by the ReplicaSet.
+* Other types of Services:
+    * ClusterIP (default type): Exposes port only within the cluster. No external access.
+    When we created NodePort, ClusterIP was also created.
+    * LoadBalancer: This used with cloud providers load balancer.
 
