@@ -117,52 +117,51 @@ PORT=$(kubectl get svc go-demo-2-svc -ojsonpath="{.spec.ports[0].nodePort}")
 * The ***selector*** is used by the Service to know which Pods should receive requests. It works in the same way as ReplicaSet selectors. In this case, we defined that the service should forward requeststo Pods with labels typeset to backend and service set to go-demo. Those two labels are set in the Pods spec of the ReplicaSet.
 
 * Now creating the service:
+```
+    kubectl create -f svc/go-demo-2-svc.yml
 
-    ```
-        kubectl create -f svc/go-demo-2-svc.yml
+    kubectl get -f svc/go-demo-2-svc.yml
 
-        kubectl get -f svc/go-demo-2-svc.yml
+    output ->
 
-        output ->
+    NAME        TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)           AGE
+    go-demo-2   NodePort   10.108.186.40   <none>        28017:30001/TCP   41s
 
-        NAME        TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)           AGE
-        go-demo-2   NodePort   10.108.186.40   <none>        28017:30001/TCP   41s
+    kubectl get ep go-demo-2 -o yaml
 
-        kubectl get ep go-demo-2 -o yaml
+    output->
 
-        output->
-
-        apiVersion: v1
-        kind: Endpoints
-        metadata:
-        creationTimestamp: "2020-01-27T15:06:15Z"
-        name: go-demo-2
+    apiVersion: v1
+    kind: Endpoints
+    metadata:
+    creationTimestamp: "2020-01-27T15:06:15Z"
+    name: go-demo-2
+    namespace: default
+    resourceVersion: "241757"
+    selfLink: /api/v1/namespaces/default/endpoints/go-demo-2
+    uid: 901a8a9c-4116-11ea-853b-02a6959db9c2
+    subsets:
+    - addresses:
+    - ip: 172.244.1.11
+        nodeName: anirban2c.example.com
+        targetRef:
+        kind: Pod
+        name: go-demo-2-cwkgv
         namespace: default
-        resourceVersion: "241757"
-        selfLink: /api/v1/namespaces/default/endpoints/go-demo-2
-        uid: 901a8a9c-4116-11ea-853b-02a6959db9c2
-        subsets:
-        - addresses:
-        - ip: 172.244.1.11
-            nodeName: anirban2c.example.com
-            targetRef:
-            kind: Pod
-            name: go-demo-2-cwkgv
-            namespace: default
-            resourceVersion: "238142"
-            uid: 5778f674-4059-11ea-8c7a-02a6959db9c2
-        - ip: 172.244.2.9
-            nodeName: anirban3c.example.com
-            targetRef:
-            kind: Pod
-            name: go-demo-2-5gxzc
-            namespace: default
-            resourceVersion: "238149"
-            uid: 57788718-4059-11ea-8c7a-02a6959db9c2
-        ports:
-        - port: 28017
-            protocol: TCP
-    ```
+        resourceVersion: "238142"
+        uid: 5778f674-4059-11ea-8c7a-02a6959db9c2
+    - ip: 172.244.2.9
+        nodeName: anirban3c.example.com
+        targetRef:
+        kind: Pod
+        name: go-demo-2-5gxzc
+        namespace: default
+        resourceVersion: "238149"
+        uid: 57788718-4059-11ea-8c7a-02a6959db9c2
+    ports:
+    - port: 28017
+        protocol: TCP
+```
 
 * We can see that there are two subsets, corresponding to the two Pods that contain the same labels asthe Service selector. Each has a unique IP that is included in the algorithm used when forwarding requests. Actually,it’s notmuch of an algorithm. Requests will be sent to those Pods randomly.Thatrandomness results in something similar to round-robin load balancing. If the number of Pods does not change, each will receive an approximately equal number of requests. Random requests forwarding should be enough for most use cases. If it’s not, we’d need to resort to a third-party solution (for now). However soon, when Kubernetes 1.9 gets released, we’ll have an alternative to the iptables solution. We’ll be able to apply different types of loadbalancing algorithms like last connection, destination hashing, newer queue, and so on. Still, the current solution is based on iptables, and we’ll stick with it, for now.
 
