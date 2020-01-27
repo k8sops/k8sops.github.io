@@ -76,7 +76,12 @@ External Traffic Policy:  Cluster
 Events:                   <none>
 ```
 
+* Since the Service is associated with the Pods created through the ReplicaSet, it inherited all their labels. The selector matches the one from the ReplicaSet. The Service is not directly associated with the ReplicaSet (or any other controller) but with Pods through matching labels.
 
+```
+PORT=$(kubectl get svc go-demo-2-svc -ojsonpath="{.spec.ports[0].nodePort}")
+```
 
+* Next is the Node Port type which exposes ports to all the nodes. Since Node Port automatically created Cluster IP type as well,all the Pods in the cluster can access the TargetPort. The Port is set to 28017.That is the port that the Pods can use to access the Service. Since we did not specify it explicitly when we executed the command, its value is the same as the value of theTargetPort, which is the portof the associated Pod that will receive all the requests.NodePortwas generated automatically sincewe did not set it explicitly. It is the port which we can use to access the Service and, therefore, thePods from outside the cluster. In most cases, it should be randomly generated, that way we avoid any clashes.
 
 
