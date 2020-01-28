@@ -167,3 +167,56 @@ PORT=$(kubectl get svc go-demo-2-svc -ojsonpath="{.spec.ports[0].nodePort}")
 
 * We still have a flawed design. Both the containers API & DB are in the same Pod.
 
+# Splitting the Pod and establishing communication through services
+* Seperate ReplicaSet & Service yaml for DB & API
+* Declaration for DB:
+    * ReplicaSet
+        ```
+            cat svc/go-demo-2-db-rs.yml
+            apiVersion:  apps/v1
+            kind: ReplicaSet
+            metadata:
+                name: go-demo-2-db
+            spec:
+                selector:
+                    matchLabels:
+                        type: db
+                        service: go-demo-2
+                template:
+                    metadata:
+                    labels:
+                        type: db
+                        service: go-demo-2
+                        vendor: MongoLabs
+                spec:
+                    containers:
+                    - name: db
+                        image: mongo:3.3
+                        ports:
+                    - containerPort: 28017
+        ```
+        * Changes here are:
+            * We have left the replicas count to be default to 1
+            * updated the selector labels ***type*** to db. This is to differntiate between db and api
+    * Service
+        ```
+        cat svc/go-demo-2-db-svc.yml
+        apiVersion: v1
+        kind: Service
+        metadata:
+            name: go-demo-2-db
+        spec:
+            ports:
+            - port: 27017
+            selector:
+                type: db
+                service: go-demo-2
+        ```
+    * Creating the DB RS and SVC:
+        ```
+            kubectl create -f  svc/go-demo-2-db-rs.yml
+            kubectl create -f svc/go-demo-2-db-svc.yml
+        ```
+* Declaration for API:
+    * ReplicaSet
+    * Service
