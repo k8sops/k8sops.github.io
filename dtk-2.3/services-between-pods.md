@@ -219,4 +219,45 @@ PORT=$(kubectl get svc go-demo-2-svc -ojsonpath="{.spec.ports[0].nodePort}")
         ```
 * Declaration for API:
     * ReplicaSet
+        ```
+        cat svc/go-demo-2-api-rs.yml
+        apiVersion:  apps/v1
+        kind: ReplicaSet
+        metadata:
+        name: go-demo-2-api
+        spec:
+        replicas: 3
+        selector:
+            matchLabels:
+            type: api
+            service: go-demo-2
+        template:
+            metadata:
+            labels:
+                type: api
+                service: go-demo-2
+                language: go
+            spec:
+            containers:
+            - name: api
+                image: vfarcic/go-demo-2
+                env:
+                - name: DB
+                value: go-demo-2-db
+                readinessProbe:
+                httpGet:
+                    path: /demo/hello
+                    port: 8080
+                periodSeconds: 1
+                livenessProbe:
+                httpGet:
+                    path: /demo/hello
+                    port: 8080
+        ```
+        * Number of replicas have been changed to ***3***
+        * Finally we can now have API Pod count different that DB
+        * type label has been updated to api, to differentiate from db
+        * ***Environment*** variable ***DB*** is set to ***go-demo-2-db***
+        This variable is read by api app and tells the app that the DB app is available at dns named go-demo-2-db. And this was setup using db services yaml.
+        * Readiness Probe: The readiness Probe has the same fields as thelivenessProbe. We used the same values for both,except for the periodSeconds, where instead of relying on the default value of 10, we set it to 1.While livenessProbe is used to determine whether a Pod is alive or it should be replaced by a new one, the readinessProbe is used by the iptables. A Pod that does not pass the readinessProbe will be excluded and will not receive requests. In theory, Requests might be still sent to a faulty Pod,between two iterations. Still, such requests will be small in number since theiptableswill changeas soon as the next probe responds with HTTP code less than200, or equal or greater than400.Ideally,an application would have different end-points for the readinessProbe and the livenessProbe.
     * Service
