@@ -260,4 +260,59 @@ PORT=$(kubectl get svc go-demo-2-svc -ojsonpath="{.spec.ports[0].nodePort}")
         * ***Environment*** variable ***DB*** is set to ***go-demo-2-db***
         This variable is read by api app and tells the app that the DB app is available at dns named go-demo-2-db. And this was setup using db services yaml.
         * Readiness Probe: The readiness Probe has the same fields as thelivenessProbe. We used the same values for both,except for the periodSeconds, where instead of relying on the default value of 10, we set it to 1.While livenessProbe is used to determine whether a Pod is alive or it should be replaced by a new one, the readinessProbe is used by the iptables. A Pod that does not pass the readinessProbe will be excluded and will not receive requests. In theory, Requests might be still sent to a faulty Pod,between two iterations. Still, such requests will be small in number since theiptableswill changeas soon as the next probe responds with HTTP code less than200, or equal or greater than400.Ideally,an application would have different end-points for the readinessProbe and the livenessProbe.
+
     * Service
+        ```
+        create the api replicaset
+        kubectl create -f svc/go-demo-2-api-rs.yml
+        
+        cat svc/go-demo-2-api-svc.yml
+        apiVersion: v1
+        kind: Service
+        metadata:
+        name: go-demo-2-api
+        spec:
+        type: NodePort
+        ports:
+        - port: 8080
+        selector:
+            type: api
+            service: go-demo-2
+        ```
+        * The ***type*** is set to NodePort since the API should be accessible from outside the cluster. The selector label is set to ***api*** so that it matches the labels defined for the Pod.
+        ```
+        kubectl create -f svc/go-demo-2-api-svc.yml 
+
+        kubectl get all
+        
+        NAME                      READY   STATUS    RESTARTS   AGE
+        pod/go-demo-2-api-jmtzw   1/1     Running   0          5s
+        pod/go-demo-2-api-xqm5r   1/1     Running   0          5s
+        pod/go-demo-2-api-xwrr5   1/1     Running   0          5s
+        pod/go-demo-2-db-sntht    1/1     Running   2          32h
+
+        NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+        service/go-demo-2-api   NodePort    10.97.178.246   <none>        8080:31263/TCP   3m58s
+        service/go-demo-2-db    ClusterIP   10.98.169.120   <none>        27017/TCP        32h
+        service/kubernetes      ClusterIP   10.96.0.1       <none>        443/TCP          21d
+
+        NAME                            DESIRED   CURRENT   READY   AGE
+        replicaset.apps/go-demo-2-api   3         3         3       6s
+        replicaset.apps/go-demo-2-db    1         1         1       32h
+        ```
+        * Verify if we can access the api:
+        
+        ```
+        PORT=$(kubectl get svc go-demo-2-api -ojsonpath="{.spec.ports[0].nodePort}")
+        
+        curl -i"http://$IP:$PORT/demo/hello
+
+        curl -i localhost:$PORT/demo/hello
+        HTTP/1.1 200 OK
+        Date: Wed, 29 Jan 2020 12:13:04 GMT
+        Content-Length: 14
+        Content-Type: text/plain; charset=utf-8
+
+        hello, world!
+        ```
+    ## Defining Multiple Objects In The Same YAML file
