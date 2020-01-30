@@ -317,5 +317,119 @@ PORT=$(kubectl get svc go-demo-2-svc -ojsonpath="{.spec.ports[0].nodePort}")
 
             hello, world!
         ```
-        
-    ## Defining Multiple Objects In The Same YAML file
+
+## Defining Multiple Objects In The Same YAML file
+* Notice the definitions are separated by three dashes (---)
+
+```
+cat svc/go-demo-2.yml
+
+
+apiVersion:  apps/v1
+kind: ReplicaSet
+metadata:
+  name: go-demo-2-db
+spec:
+  selector:
+    matchLabels:
+      type: db
+      service: go-demo-2
+  template:
+    metadata:
+      labels:
+        type: db
+        service: go-demo-2
+        vendor: MongoLabs
+    spec:
+      containers:
+      - name: db
+        image: mongo:3.3
+        ports:
+        - containerPort: 28017
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-demo-2-db
+spec:
+  ports:
+  - port: 27017
+  selector:
+    type: db
+    service: go-demo-2
+
+---
+
+apiVersion:  apps/v1
+kind: ReplicaSet
+metadata:
+  name: go-demo-2-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      type: api
+      service: go-demo-2
+  template:
+    metadata:
+      labels:
+        type: api
+        service: go-demo-2
+        language: go
+    spec:
+      containers:
+      - name: api
+        image: vfarcic/go-demo-2
+        env:
+        - name: DB
+          value: go-demo-2-db
+        readinessProbe:
+          httpGet:
+            path: /demo/hello
+            port: 8080
+          periodSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /demo/hello
+            port: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-demo-2-api
+spec:
+  type: NodePort
+  ports:
+  - port: 8080
+  selector:
+    type: api
+    service: go-demo-2
+```
+* Creating using the combined file. The end result should be the same as four files above.
+
+```
+kubectl create -f svc/go-demo-2.yml
+
+replicaset.apps/go-demo-2-db created
+service/go-demo-2-db created
+replicaset.apps/go-demo-2-api created
+service/go-demo-2-api created
+```
+
+```
+PORT=$(kubectl get svc go-demo-2-api -ojsonpath="{.spec.ports[0].nodePort}")
+
+curl -i "http://localhost:32509/demo/hello"
+HTTP/1.1 200 OK
+Date: Thu, 30 Jan 2020 02:03:31 GMT
+Content-Length: 14
+Content-Type: text/plain; charset=utf-8
+
+hello, world!
+
+```
+
