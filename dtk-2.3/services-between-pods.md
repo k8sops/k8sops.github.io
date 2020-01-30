@@ -302,7 +302,7 @@ PORT=$(kubectl get svc go-demo-2-svc -ojsonpath="{.spec.ports[0].nodePort}")
             replicaset.apps/go-demo-2-db    1         1         1       32h
         ```
 
-        * Verify if we can access the api:
+    * Verify if we can access the api:
         
         ```
             PORT=$(kubectl get svc go-demo-2-api -ojsonpath="{.spec.ports[0].nodePort}")
@@ -317,4 +317,5 @@ PORT=$(kubectl get svc go-demo-2-svc -ojsonpath="{.spec.ports[0].nodePort}")
 
             hello, world!
         ```
+        
     ## Defining Multiple Objects In The Same YAML file
