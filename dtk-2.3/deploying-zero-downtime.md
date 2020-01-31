@@ -2,7 +2,7 @@
 layout: page
 title: Deploying Zero Downtime
 category: dtk-2.3
-permalink: /dtk-2.3/discovering-services
+permalink: /dtk-2.3/deploying-zero-downtime
 chapter: 3
 ---
 
@@ -116,3 +116,60 @@ replicaset.apps/go-demo-2-db-b449d94f   1         1         1       5m4s
 
 ![alt text](images/deployment_stack.png "Deployment Stack")
 
+## Sequence of Events when deploying a Deployment
+1. Kubernetes client (kubectl) sent a request to the API server requesting the creation of a Deployment defined in the deploy/go-demo-2-db.yml file.
+2. The deployment controller is watching the API server for new events and it detected that there is a new Deployment object.
+3. The deployment controller creates a new ReplicaSet object.
+
+![alt text](images/deployment_sequence_diagram.png "Deployment Sequence diagram")
+
+## Updating Deployments
+Upgrading the Mongo DB to 3.4 version.
+
+```
+kubectl set image -f deploy/go-demo-2-db.yml db=mongo:3.5 --record
+# db is the name of the container in spec.
+
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  26s   deployment-controller  Scaled up replica set go-demo-2-db-84ccb8747 to 1
+  Normal  ScalingReplicaSet  18s   deployment-controller  Scaled down replica set go-demo-2-db-b449d94f to 0
+```
+* We can see that it created a new ReplicaSet and that it scaled the old ReplicaSet to 0. If, in your case,the last line did not appear, you’ll need to wait until the new version of themongoimage is pulled. Instead of operating directly on the level of Pods, the Deployment created a new ReplicaSet which, in turn,produced Pods based on the new image.Once they became fully operational, it scaled the old ReplicaSet to 0. Since we are running a ReplicaSet with only one replica, it might not be clear why it used that strategy. When we create a Deployment for the API, things will become more evident.To be on the safe side, we might want to retrieve all the objects from the cluster.
+
+```
+
+kubectl get all
+
+NAME                               READY   STATUS    RESTARTS   AGE
+pod/go-demo-2-db-84ccb8747-jh2b9   1/1     Running   0          118s
+
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   23d
+
+NAME                           READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/go-demo-2-db   1/1     1            1           7h40m
+
+NAME                                     DESIRED   CURRENT   READY   AGE
+replicaset.apps/go-demo-2-db-84ccb8747   1         1         1       118s
+replicaset.apps/go-demo-2-db-b449d94f    0         0         0       7h40m
+
+```
+
+### Pod Name hash
+* The Pod name is a hash which matches the hash of the ReplicaSet. 84ccb8747
+* If we destroy the Deployment and re-create the name would remain the same. Since this is name is derived by hashing the PodTemplate of the ReplicaSet.
+* That way Deployment would know if anything related Pods has changed in PodTemplate and if it does would create a new ReplicaSet.
+* ***kubctl set image*** command has an alternative. ***kubectl edit***
+```
+kubectl edit -f deploy/go-demo-2-db.yml
+# you’ll need to type:qfollowed by the enter key to exit
+```
+* ***set iamge** is the better option and also used in CI/CD process.
+* Another ***alternative*** is to update the yaml file and do ***apply***
+
+Finishing the database setup by creating the service.
+```
+kubectl create -f deploy/go-demo-2-db-svc.yml --record
+```
