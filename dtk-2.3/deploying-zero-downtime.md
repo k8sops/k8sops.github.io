@@ -223,7 +223,7 @@ spec:
             port: 8080
 ```
 
-* ****minReadySeconds*** defines the minimum number of seconds before Kubernetes starts considering the Pods healthy. We put the value of this field to 1 second. The default value is 0, meaning that the Pods will be considered available as soon as they are ready and, when specified, ***livenessProbe*** returns OK. If in doubt, omit this field and leave it to the default value of 0.
+* ***minReadySeconds*** defines the minimum number of seconds before Kubernetes starts considering the Pods healthy. We put the value of this field to 1 second. The default value is 0, meaning that the Pods will be considered available as soon as they are ready and, when specified, ***livenessProbe*** returns OK. If in doubt, omit this field and leave it to the default value of 0.
 
 * ***revisionHistoryLimit*** It defines the number of old ReplicaSets we can rollback. Like most of the fields, it is set to the sensible default value of 10. We changed it to 5 and, as a result, we will be able to rollback to any of the previous five ReplicaSets.
 
@@ -319,4 +319,28 @@ spec:
   ```
 ### How scale up & down transpired
 We can see that the number of desired replicas is 3. The same number was updated and all are available. At the bottom of the output are events associated with the Deployment. The process started by increasing the number of replicas of the new ReplicaSet (go-demo-2-api-86469df75d) to 1. Next, it decreased the number of replicas of the old ReplicaSet (go-demo-2-api-6c8867677b) to2. The same process of increasing replicas of the new, and decreasing replicas of the old ReplicaSet continued until the new one got the desired number (3), and the old one dropped to zero.There was no downtime throughout the process.Users would receive a response from the application no matter whether they sent it before, during, or after the update. The only important thing is that,during the update, a response might  have come from the old or the new release. During the update process, both releases were running in parallel.
+
+```
+kubectl rollout history -f deploy/go-demo-2-api.yml
+
+deployment.apps/go-demo-2-api
+REVISION  CHANGE-CAUSE
+1         kubectl create --filename=deploy/go-demo-2-api.yml --record=true
+2         kubectl set image api=vfarcic/go-demo-2:2.0 --filename=deploy/go-demo-2-api.yml --record=true
+```
+
+* New ReplicaSet were created. Older ones were left behind for rollback scenario.
+```
+kubectl get rs
+NAME                       DESIRED   CURRENT   READY   AGE
+go-demo-2-api-6c8867677b   3         3         3       6h51m // New ReplicaSet
+go-demo-2-api-86469df75d   0         0         0       6h57m // Older ReplicaSet
+go-demo-2-db-84ccb8747     1         1         1       10h
+go-demo-2-db-b449d94f      0         0         0       18h
+```
+
+![alt text](images/rollingupgrade_sequence.png "Rolling Upgrade Sequence")
+
+
+
 
