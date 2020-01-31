@@ -262,3 +262,61 @@ spec:
   replicaset.apps/go-demo-2-db-84ccb8747     1         1         1       4h3m
   replicaset.apps/go-demo-2-db-b449d94f      0         0         0       11h
   ```
+
+  * Now the we have 3 Pods of API running we will roll out changes using a newer version of image.
+
+  ```
+  kubectl set image -f deploy/go-demo-2-api.yml api=vfarcic/go-demo-2:2.0 --record
+  deployment.apps/go-demo-2-api image updated
+
+  kubectl rollout status -w -f deploy/go-demo-2-api.yml
+  deployment "go-demo-2-api" successfully rolled out
+
+  kubectl describe -f deploy/go-demo-2-api.yml
+
+  Name:                   go-demo-2-api
+  Namespace:              default
+  CreationTimestamp:      Fri, 31 Jan 2020 14:42:29 +0000
+  Labels:                 <none>
+  Annotations:            deployment.kubernetes.io/revision: 2
+                          kubernetes.io/change-cause: kubectl set image api=vfarcic/go-demo-2:2.0 --filename=deploy/go-demo-2-api.yml --record=true
+  Selector:               service=go-demo-2,type=api
+  Replicas:               3 desired | 3 updated | 3 total | 3 available | 0 unavailable
+  StrategyType:           RollingUpdate
+  MinReadySeconds:        1
+  RollingUpdateStrategy:  1 max unavailable, 1 max surge
+  Pod Template:
+    Labels:  language=go
+            service=go-demo-2
+            type=api
+    Containers:
+    api:
+      Image:      vfarcic/go-demo-2:2.0
+      Port:       <none>
+      Host Port:  <none>
+      Liveness:   http-get http://:8080/demo/hello delay=0s timeout=1s period=10s #success=1 #failure=3
+      Readiness:  http-get http://:8080/demo/hello delay=0s timeout=1s period=1s #success=1 #failure=3
+      Environment:
+        DB:    go-demo-2-db
+      Mounts:  <none>
+    Volumes:   <none>
+  Conditions:
+    Type           Status  Reason
+    ----           ------  ------
+    Available      True    MinimumReplicasAvailable
+    Progressing    True    NewReplicaSetAvailable
+  OldReplicaSets:  <none>
+  NewReplicaSet:   go-demo-2-api-6c8867677b (3/3 replicas created)
+  Events:
+    Type    Reason             Age    From                   Message
+    ----    ------             ----   ----                   -------
+    Normal  ScalingReplicaSet  7m38s  deployment-controller  Scaled up replica set go-demo-2-api-86469df75d to 3
+    Normal  ScalingReplicaSet  2m     deployment-controller  Scaled up replica set go-demo-2-api-6c8867677b to 1
+    Normal  ScalingReplicaSet  2m     deployment-controller  Scaled down replica set go-demo-2-api-86469df75d to 2
+    Normal  ScalingReplicaSet  2m     deployment-controller  Scaled up replica set go-demo-2-api-6c8867677b to 2
+    Normal  ScalingReplicaSet  116s   deployment-controller  Scaled down replica set go-demo-2-api-86469df75d to 0
+    Normal  ScalingReplicaSet  116s   deployment-controller  Scaled up replica set go-demo-2-api-6c8867677b to 3
+  ```
+### How scale up & down transpired
+We can see that the number of desired replicas is 3. The same number was updated and all are available. At the bottom of the output are events associated with the Deployment. The process started by increasing the number of replicas of the new ReplicaSet (go-demo-2-api-86469df75d) to 1. Next, it decreased the number of replicas of the old ReplicaSet (go-demo-2-api-6c8867677b) to2. The same process of increasing replicas of the new, and decreasing replicas of the old ReplicaSet continued until the new one got the desired number (3), and the old one dropped to zero.There was no downtime throughout the process.Users would receive a response from the application no matter whether they sent it before, during, or after the update. The only important thing is that,during the update, a response might  have come from the old or the new release. During the update process, both releases were running in parallel.
+
