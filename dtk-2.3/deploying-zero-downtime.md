@@ -173,3 +173,9 @@ Finishing the database setup by creating the service.
 ```
 kubectl create -f deploy/go-demo-2-db-svc.yml --record
 ```
+
+## Zero Downtime Deployments
+* game of 9's. Atleast 99.99 or even 99.999 percent availability.
+* The reason we’re discussing failures and scalability lies in the nature of immutable deployments. If a Pod is unchangeable, the only way to update it with a new release is to destroy the old ones andput the Pods based on the new image in their place.
+* Destruction of Pods is not much different from failures. In both cases, they cease to work. On the other hand, fault tolerance (re-scheduling) is areplacement of failed Pods. The only essential difference is that new releases result in Pods being replaced with new ones based on the new image.
+* 
