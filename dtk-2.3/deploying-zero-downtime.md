@@ -178,4 +178,87 @@ kubectl create -f deploy/go-demo-2-db-svc.yml --record
 * game of 9's. Atleast 99.99 or even 99.999 percent availability.
 * The reason we’re discussing failures and scalability lies in the nature of immutable deployments. If a Pod is unchangeable, the only way to update it with a new release is to destroy the old ones andput the Pods based on the new image in their place.
 * Destruction of Pods is not much different from failures. In both cases, they cease to work. On the other hand, fault tolerance (re-scheduling) is areplacement of failed Pods. The only essential difference is that new releases result in Pods being replaced with new ones based on the new image.
-* 
+* Deployment definition of the API:
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-demo-2-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      type: api
+      service: go-demo-2
+  minReadySeconds: 1
+  progressDeadlineSeconds: 60
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        type: api
+        service: go-demo-2
+        language: go
+    spec:
+      containers:
+      - name: api
+        image: vfarcic/go-demo-2
+        env:
+        - name: DB
+          value: go-demo-2-db
+        readinessProbe:
+          httpGet:
+            path: /demo/hello
+            port: 8080
+          periodSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /demo/hello
+            port: 8080
+```
+
+* ****minReadySeconds*** defines the minimum number of seconds before Kubernetes starts considering the Pods healthy. We put the value of this field to 1 second. The default value is 0, meaning that the Pods will be considered available as soon as they are ready and, when specified, ***livenessProbe*** returns OK. If in doubt, omit this field and leave it to the default value of 0.
+
+* ***revisionHistoryLimit*** It defines the number of old ReplicaSets we can rollback. Like most of the fields, it is set to the sensible default value of 10. We changed it to 5 and, as a result, we will be able to rollback to any of the previous five ReplicaSets.
+
+* The strategy can be either the ***RollingUpdate*** or the ***Recreatetype*** 
+  * ***Recreatetype*** : Kill's all the existing Pods before an update. Recreate resembles the processes we used in the past when the typical strategy for deploying a new release was first to stop the existing one and then put a new one in its place. This approach inevitably leads to downtime. The only case when this strategy isuseful is when applications are not designed for two releases to coexist. Unfortunately, that is still more common than it should be.Ifyou’re in doubt whether your application is like that,ask yourself the following question. Would there be an adverse effect if two different versions of my application are running in parallel? If that’s the case, a Recreatestrategy might be a good choice and you must be aware that you cannot accomplish zero-downtime deployments.
+
+  * ***RollingUpdate*** : the default type, for a good reason. It allows us to deploy new releases without downtime. It creates a new ReplicaSet with zero replicas and, depending on other parameters, increases the replicas of the new one, and decreases those from the old one. The process is finished when the replicas of the new ReplicaSet entirely replace those from the old one.
+
+  * When RollingUpdate is the strategy of choice, it can be fine-tuned with the ***maxSurge*** and ***maxUnavailable*** fields.The former defines the maximum number of Pods that can exceed the desired number (set using replicas). It can be set to an absolute number (e.g.,2) or a percentage (e.g.,35%). The total number of Pods will never exceed the desired number (set using replicas) and the maxSurge combined. The default value is 25%. maxUnavailable defines the maximum number of Pods that are not operational. If, for example, the number of replicas is set to 15 and this field is set to 4, the minimum number of Pods that would run at any given moment would be 11. Just as the maxSurge field, this one also defaults to 25%. If this field is not specified, there will always be at least 75% of the desired Pods. In most cases, the default values of the Deployment specific fields are a good option.
+
+  * The ***template*** is the same PodTemplate we used before.Best practice is to be explicit with image tags like we did when we set mongo:3.3. Best option would have been to say something like ***vfarcic/go-demo-2:1.0***
+  It is okay for initial cluster setup.
+
+  ```
+  kubectl create -f deploy/go-demo-2-api.yml --record
+  deployment.apps/go-demo-2-api created
+
+  kubectl get all
+  
+  NAME                                 READY   STATUS    RESTARTS   AGE
+  pod/go-demo-2-api-86469df75d-sq6mv   1/1     Running   0          48s
+  pod/go-demo-2-api-86469df75d-trbd9   1/1     Running   0          48s
+  pod/go-demo-2-api-86469df75d-vlknk   1/1     Running   0          48s
+  pod/go-demo-2-db-84ccb8747-jh2b9     1/1     Running   1          4h3m
+
+  NAME                   TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)     AGE
+  service/go-demo-2-db   ClusterIP   10.109.243.89   <none>        27017/TCP   3h28m
+  service/kubernetes     ClusterIP   10.96.0.1       <none>        443/TCP     24d
+
+  NAME                            READY   UP-TO-DATE   AVAILABLE   AGE
+  deployment.apps/go-demo-2-api   3/3     3            3           48s
+  deployment.apps/go-demo-2-db    1/1     1            1           11h
+
+  NAME                                       DESIRED   CURRENT   READY   AGE
+  replicaset.apps/go-demo-2-api-86469df75d   3         3         3       48s
+  replicaset.apps/go-demo-2-db-84ccb8747     1         1         1       4h3m
+  replicaset.apps/go-demo-2-db-b449d94f      0         0         0       11h
+  ```
