@@ -213,3 +213,74 @@ All four objects(two Deployments and two Services) were created, and we can move
 
 
 ## Updating Multiple Objects
+Even though most of the time we send requests to specific objects, almost everything is happeningusing selector labels. When we updated the Deployments, they looked for matching selectors tochoose which ReplicaSets to create and scale. They, in turn, created or terminated Pods also using the matching selectors. Almost everything in Kubernetes is operated using label selectors. It’s just that sometimes that is obscured from us.
+
+We do not have to update an object only by specifying its name or the YAML file where its definition resides. We can also use labels to decide which object should be updated. That opens some interesting possibilities since the selectors might match multiple objects.
+
+Say we have another deployment of Mongo DB, with the same labels.
+
+```
+cat deploy/different-app-db.yml 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: different-app-db
+  labels:
+    type: db
+    service: different-app
+    vendor: MongoLabs
+spec:
+  selector:
+    matchLabels:
+      type: db
+      service: different-app
+  template:
+    metadata:
+      labels:
+        type: db
+        service: different-app
+        vendor: MongoLabs
+    spec:
+      containers:
+      - name: db
+        image: mongo:3.3
+        ports:
+        - containerPort: 28017
+```
+When compared with the go-demo-2-db Deployment, the only difference is in the ***service*** label. Both have the ***type*** set to db
+
+```
+kubectl create -f deploy/different-app-db.yml 
+deployment.apps/different-app-db created
+```
+
+Since we want to update the Deployments of DB, will use the below:
+```
+kubectl get deployment --show-labels
+
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE   LABELS
+different-app-db   1/1     1            1           69s   service=different-app,type=db,vendor=MongoLabs
+go-demo-2-api      3/3     3            3           63m   language=go,service=go-demo-2,type=api
+go-demo-2-db       1/1     1            1           63m   service=go-demo-2,type=db,vendor=MongoLabs
+
+kubectl get deployments -l type=db,vendor=MongoLabs
+
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+different-app-db   1/1     1            1           115m
+go-demo-2-db       1/1     1            1           178m
+```
+
+By using the label filter (-l) we were able to filter Pods for Mongo Db's
+```
+kubectl set image deployments -l type=db,vendor=MongoLabs db=mongo:3.4 --record
+deployment.extensions/different-app-db image updated
+deployment.extensions/go-demo-2-db image updated
+```
+Shows that two Deployments were updated. Can be verified using ***describe***
+```
+kubectl describe -f deploy/go-demo-2.yml
+Containers:
+   db:
+    Image:        mongo:3.4
+```
+
