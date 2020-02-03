@@ -8,6 +8,70 @@ chapter: 4
 
 # Rollingback or Forward
 
+* Rolling back a release that introduced database changes is often not possible. Even when itis, rolling forward is usually a better option when practicing continuous deployment withhigh-frequency releases limited to a small scope of changes.
+* If you do frequent releases then rolling back a few hours of work can be the best option. It depends from project to project.
+
+```
+// invoking the rollback command
+kubectl rollout undo -f deploy/go-demo-2-api.yml 
+deployment.apps/go-demo-2-api rolled back
+
+// describing to check the events that transpired
+kubectl describe -f deploy/go-demo-2-api.yml 
+Name:                   go-demo-2-api
+Namespace:              default
+CreationTimestamp:      Fri, 31 Jan 2020 14:42:29 +0000
+Labels:                 <none>
+Annotations:            deployment.kubernetes.io/revision: 3
+                        kubernetes.io/change-cause: kubectl create --filename=deploy/go-demo-2-api.yml --record=true
+Selector:               service=go-demo-2,type=api
+Replicas:               3 desired | 3 updated | 3 total | 3 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        1
+RollingUpdateStrategy:  1 max unavailable, 1 max surge
+Pod Template:
+  Labels:  language=go
+           service=go-demo-2
+           type=api
+  Containers:
+   api:
+    Image:      vfarcic/go-demo-2
+    Port:       <none>
+    Host Port:  <none>
+    Liveness:   http-get http://:8080/demo/hello delay=0s timeout=1s period=10s #success=1 #failure=3
+    Readiness:  http-get http://:8080/demo/hello delay=0s timeout=1s period=1s #success=1 #failure=3
+    Environment:
+      DB:    go-demo-2-db
+    Mounts:  <none>
+  Volumes:   <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  <none>
+NewReplicaSet:   go-demo-2-api-86469df75d (3/3 replicas created)
+Events:
+  Type    Reason             Age   From                   Message
+  ----    ------             ----  ----                   -------
+  Normal  ScalingReplicaSet  70s   deployment-controller  Scaled up replica set go-demo-2-api-86469df75d to 1
+  Normal  ScalingReplicaSet  70s   deployment-controller  Scaled down replica set go-demo-2-api-6c8867677b to 2
+  Normal  ScalingReplicaSet  70s   deployment-controller  Scaled up replica set go-demo-2-api-86469df75d to 2
+  Normal  ScalingReplicaSet  66s   deployment-controller  Scaled down replica set go-demo-2-api-6c8867677b to 1
+  Normal  ScalingReplicaSet  66s   deployment-controller  Scaled up replica set go-demo-2-api-86469df75d to 3
+  Normal  ScalingReplicaSet  65s   deployment-controller  Scaled down replica set go-demo-2-api-6c8867677b to 0
+```
+* We can see from the events section that the Deployment initiated rollback and, from there on, the process we experienced before was reversed. It started increasing the replicas of the older ReplicaSet,and decreasing those from the latest one. Once the process is finished, the older ReplicaSet became active with all the replicas, and the newer one was scaled down to zero.
+* Checking the revision history now:
+```
+kubectl rollout history -f deploy/go-demo-2-api.yml
+deployment.apps/go-demo-2-api
+
+REVISION  CHANGE-CAUSE
+2         kubectl set image api=vfarcic/go-demo-2:2.0 --filename=deploy/go-demo-2-api.yml --record=true
+3         kubectl create --filename=deploy/go-demo-2-api.yml --record=true
+```
+
 ## Undo Rollouts
 * There are scenarios where rolling forward is not an option. In those cases we can rollback using the ***rollout undo*** command.
 
