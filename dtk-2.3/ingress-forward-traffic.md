@@ -101,3 +101,25 @@ curl -i "http://localhost:$PORT"
 
 A user sends a request to one of the nodes of the cluster. That request is received by a Service and load balanced to one of the associated Pods. It’s a bit more complicated than that, with iptables, kube DNS, kube proxy, and a few other things involved in the process.
 
+## What is the ideal setup?
+
+* There should a single route without port. Something like this:
+
+```
+for the hello app ->
+curl "http://$IP/demo/hello"
+
+for the devopstookit api ->
+
+curl -H "Host: devopstoolkitseries.com" http://localhost
+curl: (7) Failed to connect to localhost port 80: Connection refused
+
+```
+* Still doesn't work. So Services can give what we need.
+* Last,but not least, we should be able to make some, if not all, applications(partly) secure by enabling HTTPS access. That means that we should have a place to store our SSL certificates. We could put them inside our  applications, but that would only increase the operational complexity. Instead, weshould aim towards SSL offloading somewhere between clients and the applications, and it should come as no surprise that Kubernetes has a solution for all these.
+
+## Enabling Ingress Controllers
+
+* We need a mechanism that will accept requests on pre-defined ports (e.g.,80 and 443) and forward them to Kubernetes Services. It should be able to distinguish requests based on paths and domains as well as to be able to perform SSL offloading.
+* Out of the Box Kubernetes does not have a solution for Ingress Controllers. The Controllers that come in built in the kube-controller-manager library doesn't have support for Ingress.
+* Instead of the Controller, kube-controller-manager offers a ***Ingress Resource*** that other third-party solutions can can utilize to provide requests forwarding and SSL features. In other words, Kubernetes only provides an API, and we need to set up a Controller that will use it.
