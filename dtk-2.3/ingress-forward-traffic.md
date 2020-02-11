@@ -11,13 +11,16 @@ Ingress objects manage external access to the applications running within the Ku
 A tradiotinal setup would probably have a external load balancer or a proxy. ***Ingress*** provides an API to do all these things and other features that would be required for  a dynamic cluster.
 
 ## Exposing defeciences with access using Kubernetes Services
+
 * With just services we need to know the port where the app is listening. For end user that wouldn't be a good user experience.
+
 ```
 curl localhost:31961/demo/hello
 hello, world!
 ```
 
 * Creating the setup first:
+
 ```
 kubectl create -f ingress/go-demo-2-deploy.yml 
 
@@ -47,9 +50,11 @@ go-demo-2-api-86469df75d-jqt7c   1/1     Running   0          2m13s
 go-demo-2-api-86469df75d-ll9sg   1/1     Running   0          2m12s
 go-demo-2-api-86469df75d-ql8gz   1/1     Running   0          2m12s
 go-demo-2-db-5bfdb95844-zdlsj    1/1     Running   0          2m13s
+
 ```
 
 * Now to access the services this our option:
+
 ```
 PORT=$(kubectl get svc go-demo-2-api -o jsonpath="{.spec.ports[0].nodePort}")
 
@@ -64,7 +69,9 @@ Content-Type: text/plain; charset=utf-8
 
 hello, world!
 ```
+
 * This approach might not look to be a bad option with One App. To increase the issue we will deploy one more app:
+
 ```
 kubectl create -f ingress/devops-toolkit-dep.yml --record --save-config
 
