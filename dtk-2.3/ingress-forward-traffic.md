@@ -123,3 +123,15 @@ curl: (7) Failed to connect to localhost port 80: Connection refused
 * We need a mechanism that will accept requests on pre-defined ports (e.g.,80 and 443) and forward them to Kubernetes Services. It should be able to distinguish requests based on paths and domains as well as to be able to perform SSL offloading.
 * Out of the Box Kubernetes does not have a solution for Ingress Controllers. The Controllers that come in built in the kube-controller-manager library doesn't have support for Ingress.
 * Instead of the Controller, kube-controller-manager offers a ***Ingress Resource*** that other third-party solutions can can utilize to provide requests forwarding and SSL features. In other words, Kubernetes only provides an API, and we need to set up a Controller that will use it.
+
+* Setting up the NGINX Ingress Controller on bare metal:
+
+```
+# installting the Controller
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.28.0/deploy/static/mandatory.yaml
+
+# starting the service
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.28.0/deploy/static/provider/baremetal/service-nodeport.yaml
+
+```
