@@ -360,3 +360,8 @@ Can be verified using these requests:
 curl 10.99.181.61
 curl 10.99.181.61/demo/hello
 ```
+
+![alt text](images/ingress_in_a_cluster.png)
+
+***Even though we can send requests to both applications using the same port (80), that is often asub-optimal solution. Our users would probably be happier if they could access those applicationsthrough different domains.***
+
