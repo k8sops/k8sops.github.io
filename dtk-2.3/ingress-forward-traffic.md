@@ -352,7 +352,9 @@ service/devops-toolkit created
 ### Checking all Ingresses running inside the cluster
 
 ```
-kubectl get ingNAME             HOSTS   ADDRESS        PORTS   AGE
+kubectl get ing
+
+NAME             HOSTS   ADDRESS        PORTS   AGE
 devops-toolkit   *       10.99.181.61   80      51s
 go-demo-2        *       10.99.181.61   80      21m
 
@@ -365,3 +367,78 @@ curl 10.99.181.61/demo/hello
 
 ***Even though we can send requests to both applications using the same port (80), that is often asub-optimal solution. Our users would probably be happier if they could access those applicationsthrough different domains.***
 
+## Creating Ingress Resources Based on Domains
+
+Refactoring devops-toolkit Ingress definition so that the Controller forwards request coming from ***devopstoolkitseris.com*** domain.
+
+The only change reqiured for this is, removing ***path*** and using ***host***
+
+```
+kubectl apply -f ingress/devops-toolkit-dom.yml --record
+
+curl -I "http://10.99.181.61" (Now after adding host, this call returns 404)
+
+curl -I -H "Host: devopstoolkitseries.com" "http://10.99.181.61" (This returns 200 OK)
+```
+
+Also verifying out ***path*** based routing still works.
+
+```
+curl -I -H "acme.com" "http://10.99.181.61/demo/hello"
+```
+
+## Creating an Ingress Resource with a Default Backends
+
+Having default backends configured helps in handling requests that don't explicitly match.
+Like the request above with ***acme.com*** host.
+
+Also a incorrect request not served by any resource.
+
+```
+curl -I -H "acme.com" "http://10.99.181.61"
+HTTP/1.1 404 Not Found
+Server: nginx/1.17.8
+Date: Sun, 23 Feb 2020 19:09:19 GMT
+Content-Type: text/html
+Content-Length: 153
+Connection: keep-alive
+```
+
+*** When an Ingress spec is without rules, it is considered a default backend. As such, it will forward all requests that do not match paths and/or domains set as rules in the other Ingress resources. ***
+
+```
+cat ingress/default-backend.yml
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: default
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  backend:
+    serviceName: devops-toolkit
+    servicePort: 80
+
+kubectl create -f ingress/default-backend.yml 
+ingress.extensions/default created
+
+Test:
+
+curl -I -H "acme.com" "http://10.99.181.61"
+HTTP/1.1 200 OK
+Server: nginx/1.17.8
+Date: Sun, 23 Feb 2020 19:10:01 GMT
+Content-Type: text/html
+Content-Length: 6489
+Connection: keep-alive
+Vary: Accept-Encoding
+Last-Modified: Thu, 26 Dec 2019 14:27:21 GMT
+ETag: "5e04c349-1959"
+Accept-Ranges: bytes
+
+```
+
+![alt text](images/ingress_summary.png)
