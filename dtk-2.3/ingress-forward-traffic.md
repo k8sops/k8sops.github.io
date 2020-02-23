@@ -3,7 +3,7 @@ layout: page
 title: Ingress Forward Traffic
 category: dtk-2.3
 permalink: /dtk-2.3/ingress-forward-tarffic
-chapter: 6
+chapter: 7
 ---
 
 Ingress objects manage external access to the applications running within the Kubernetes clusters. We would need features like ***forwarding rules*** on paths and domains and ***SSL termination***
@@ -300,3 +300,63 @@ service "go-demo-2-api" deleted
 ```
 
 * Now lets use the file with ingress/go-demo-2-ingress.yml & ingress/go-demo-2-deploy.yml combined and removing the type: Nodeport
+
+```
+kubectl create -f ingress/go-demo-2.yml --record --save-config
+
+ingress.extensions/go-demo-2 created
+deployment.apps/go-demo-2-db created
+service/go-demo-2-db created
+deployment.apps/go-demo-2-api created
+service/go-demo-2-api created
+```
+
+* Now lets try the ***path** based access.
+
+```
+kubectl describe -f ingress/go-demo-2.yml
+Address:          10.99.181.61
+Default backend:  default-http-backend:80 (<none>)
+
+curl 10.99.181.61/demo/hello
+hello, world!
+```
+
+* Let’s see, through a sequence diagram, what happened when we created the Ingress resource.
+
+1.The Kubernetes client (kubectl) sent a request to the API server requesting the creation of theIngress resource defined in theingress/go-demo-2.ymlfile.
+
+2.The ingresscontroller is watching the API server for new events. It detected that there is a new Ingress resource.
+
+3.The ingress controller configured the load balancer. In this case, it is nginx which was enabled by minikube addons enable ingress command. It modified ***nginx.conf*** with the values of all go-demo-2-api endpoints.
+
+![alt text](images/ingress_sequence.png)
+
+* Repeating the same for devops toolkit application. Also this application is being served on ***/*** 
+
+```
+
+- http:
+      paths:
+      - path: /
+        backend:
+          serviceName: devops-toolkit
+          servicePort: 80
+
+kubectl create -f ingress/devops-toolkit.yml --record --save-config
+ingress.extensions/devops-toolkit created
+deployment.apps/devops-toolkit created
+service/devops-toolkit created
+```
+
+### Checking all Ingresses running inside the cluster
+
+```
+kubectl get ingNAME             HOSTS   ADDRESS        PORTS   AGE
+devops-toolkit   *       10.99.181.61   80      51s
+go-demo-2        *       10.99.181.61   80      21m
+
+Can be verified using these requests:
+curl 10.99.181.61
+curl 10.99.181.61/demo/hello
+```

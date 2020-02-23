@@ -3,7 +3,7 @@ layout: page
 title: Scaling Deployments
 category: dtk-2.3
 permalink: /dtk-2.3/scaling-deployments
-chapter: 5
+chapter: 6
 ---
 
 There are quite a few different ways we can scale Deployments. Everything we do in this section isnot unique to Deployments and can be applied to any Controller, like ReplicaSet, and those we didnot yet explore.If we decide that the number of replicas changes with relatively low frequency or that Deploymentsare performed manually, the best way to scale is to write a new YAML file or, even better, modifythe existing one. Assuming that we store YAML files in a code repository, by updating existing files we have a documented and reproducible definition of the objects running inside a cluster. We already performed scaling when we applied the definition from the go-demo-2-scaled.yml.We’lldo something similar, but with Deployments.Let’s take a look at deploy/go-demo-2-scaled.yml.

@@ -3,7 +3,7 @@ layout: page
 title: Deploying Zero Downtime
 category: dtk-2.3
 permalink: /dtk-2.3/deploying-zero-downtime
-chapter: 3
+chapter: 4
 ---
 
 The desired state of our applications is changing all the time. The most common reasons for newstates are new releases. The process is relatively simple. We make a change and commit it to a coderepository. We build it, and we test it. Once we’re confident that it works as expected, we deployit to a cluster. It does not matter whether that deployment is to a development, test, staging, orproduction environment. We need to deploy a new release to a cluster, even when that is a single-node Kubernetes running on a laptop. No matter how many environments we have, the processshould always be the same or, at least, as similar as possible.
