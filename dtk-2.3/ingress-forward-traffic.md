@@ -330,7 +330,9 @@ hello, world!
 
 3.The ingress controller configured the load balancer. In this case, it is nginx which was enabled by minikube addons enable ingress command. It modified ***nginx.conf*** with the values of all go-demo-2-api endpoints.
 
+
 ![alt text](images/ingress_sequence.png)
+
 
 * Repeating the same for devops toolkit application. Also this application is being served on ***/*** 
 
@@ -363,7 +365,9 @@ curl 10.99.181.61
 curl 10.99.181.61/demo/hello
 ```
 
+
 ![alt text](images/ingress_in_a_cluster.png)
+
 
 ***Even though we can send requests to both applications using the same port (80), that is often asub-optimal solution. Our users would probably be happier if they could access those applicationsthrough different domains.***
 
