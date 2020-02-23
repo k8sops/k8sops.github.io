@@ -285,3 +285,18 @@ hello, world!
 ```
 
 * Using ***type: NodePort,*** it is configured to export the port ***8080*** on all of the nodes. Since we’re expecting users to access the application through the Ingress Controller on port ***80***, there’s probably no need to allow external access through the port ***8080*** as well. We should switch to the ***ClusterIP*** type. That will allow direct access to the Service only within the cluster, thus limiting all external communication through Ingress.
+
+* We cannot just update the Service with a new definition. Once a Service port is exposed, it cannotbe un-exposed. We’ll delete thego-demo-2objects we created and start over. Besides the need tochange the Service type, that will give us an opportunity to unify everything in a single YAML file.
+
+```
+kubectl delete -f ingress/go-demo-2-ingress.yml 
+ingress.extensions "go-demo-2" deleted
+
+kubectl delete -f ingress/go-demo-2-deploy.yml 
+deployment.apps "go-demo-2-db" deleted
+service "go-demo-2-db" deleted
+deployment.apps "go-demo-2-api" deleted
+service "go-demo-2-api" deleted
+```
+
+* Now lets use the file with ingress/go-demo-2-ingress.yml & ingress/go-demo-2-deploy.yml combined and removing the type: Nodeport
