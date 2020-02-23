@@ -239,6 +239,7 @@ go-demo-2   *       10.99.181.61   80      103s
 ```
 
 * Now lets verify if we can access our go-demo-2-api using the path /demo
+
 ```
 curl -i "http://10.99.181.61/demo/hello"
 HTTP/1.1 200 OK
@@ -249,10 +250,10 @@ Content-Length: 14
 Connection: keep-alive
 
 hello, world!
+
 ```
 
 * There is still a problem with our setup here. The go-demo-2 Service we’re currently using is no longer properly configured for our Ingress setup.
-
 Our service is currently exposed on ***8080*** which is not required anymore:
 
 ```
