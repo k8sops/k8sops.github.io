@@ -109,6 +109,8 @@ mongo
 
 * Even though we executed the docker command inside a container, the output clearly shows the images from the host. We proved that mounting the Docker socket (/var/run/docker.sock) as a Volume allows communication between Docker client inside the container, and Docker server running on the host.
 
+![alt text](images/volume_mounted.png "volume mounted inside a container")
+
 HostPath mounted inside a container Let’s enter the container and see whether we can build a Docker image.
 
 ```
