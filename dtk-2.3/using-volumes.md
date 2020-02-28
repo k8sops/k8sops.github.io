@@ -179,5 +179,20 @@ pod "docker" deleted
 
 ```
 
+## Using hostPath Volume Type To Inject Configuration Files
 
+Deploying a prometheus.
+
+```
+
+kubectl create -f volume/prometheus.yml --record --save-config
+ingress.extensions/prometheus created
+deployment.apps/prometheus created
+service/prometheus created
+
+kubectl rollout status deploy prometheus
+deployment "prometheus" successfully rolled out
+
+
+```
 
