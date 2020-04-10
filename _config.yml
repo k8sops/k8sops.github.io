@@ -45,6 +45,7 @@ header_pages:
   - index.markdown
   - dtk-2.3/dtk-2.3.md
   - cka/cka.md
+  - golang/golang.md
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to
