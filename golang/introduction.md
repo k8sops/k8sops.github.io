@@ -108,3 +108,50 @@ go doc json.Decoder
 ```
 
 * comments in source code will be pulled up for display when we use the ***doc*** command.
+
+
+#### Setting up Visual Studio code for Go Development
+1. Install Go from package manager :  ms-vscode.go
+2. Mac -> cmd+shift+p -> Go:Install/Update -> check all and install
+3. succesful installation gives a message -> All tools successfully installed. You are ready to Go :).
+
+Sample project to test our setup:
+
+```
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("Hello !! Gophers....")
+}
+
+> go run main.go
+```
+Note: The compiled binary was not left behind.
+
+
+### Creating a Project
+Modules are how projects are organized. Earlier these were called workspaces.
+
+* Initializing a module:
+- Module is a directory having go.mod file.
+- mod file contains configuration and information about the module itself.
+
+```
+go mod init github.com/sample/webservice
+```
+
+Now lets add the sample main.go we had used earlier.
+Since we now have module setup we don't need use the ***run file.go***
+
+Instead:
+
+```
+go run github.com/sample/webservice
+Hello!! Gophers....
+```
+
+This would be helpful when we have multiple folders and save us from navigating.
+
+
