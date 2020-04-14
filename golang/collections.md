@@ -43,3 +43,75 @@ fmt.Println(arr2)
 ```
 
 ### Slice
+* They are built on top of Arrays.
+
+```
+package main
+
+import (
+	"fmt"
+)
+
+
+func main() {
+	
+	slice := []int{1,2,3}
+	fmt.Println(slice)
+	
+	// equivalent code underhood that the Go compiler is doing
+	/*
+	arr2 := [3]int{1,2,3}
+	fmt.Println(arr2)
+	slice := arr2[:]
+	fmt.Println(slice)
+	*/
+}
+
+```
+
+* Adding to slice using ***append***
+```
+package main
+
+import (
+	"fmt"
+)
+
+
+func main() {
+	
+	slice := []int{1,2,3}
+	fmt.Println(slice)
+	
+	slice = append(slice, 4)
+	slice = append(slice, 5,6,7)
+	fmt.Println(slice)
+}
+``` 
+
+* Other uasage with colon operator:
+```
+package main
+import (
+	"fmt"
+)
+func main() {
+	slice := []int{1,2,3}
+	fmt.Println(slice)
+	
+	slice = append(slice, 4)
+	slice = append(slice, 5,6,7)
+	fmt.Println(slice)
+	
+	s2 := slice[1:] // starting with first index till the end
+	fmt.Println(s2)
+	s3 := slice[2:] // starting with second index till the end
+	fmt.Println(s3)
+	s4 := slice[:3] // starting from first index till third index
+	fmt.Println(s4)
+    s5 := slice[2:5] // starting from first index till third index
+	fmt.Println(s5)  
+}
+```
+
+### Maps
