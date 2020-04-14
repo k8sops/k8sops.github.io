@@ -116,7 +116,7 @@ func main() {
 > 0x40c138
 arthur
 ```
-
+* de-refrence operator: *firstName
 * Address of operator:
 ```
 package main
@@ -140,4 +140,145 @@ func main() {
 > name
 0x40c138 name
 0x40c138 lastname
+```
+
+* ***constants***
+1. Cannot change their value like variables do.
+2. Has to be declared & initialized in the same line.
+3. Value of constants has to be available at compile time. Cannot have functions return values for constants.
+
+```
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	const pi = 3.14
+	fmt.Println(pi)
+	pi = 300
+}
+> cannot assign to pi
+```
+* ***implicitly typed*** constants.
+```
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	const pi = 3
+	fmt.Println(pi + 3) // using pi as integer
+	// bunch of other code
+	fmt.Println(pi + 1.2) // using pi as floating type
+}
+> 6
+4.2
+
+Above will fail when we declare:
+const pi int = 3 // now addition to float will fail.
+
+And this how it can be handled:
+fmt.Println(float32(pi) + 1.2)
+```
+
+### IOTA's and Cosntant Expressions:
+
+* Constant blocks: Seprate section for declaring constants just like ***import***
+
+```
+package main
+
+import (
+	"fmt"
+)
+
+const ( 
+pi = 3
+second = 4
+)
+
+func main() {
+	fmt.Println(second)
+	fmt.Println(pi)
+}
+```
+* ***iota***
+Every time a iota is re-used it's value is incremented by 1.
+
+```
+package main
+
+import (
+	"fmt"
+)
+
+const( 
+first = iota
+second = iota
+)
+
+func main() {
+	fmt.Println(first)
+	fmt.Println(second)
+	fmt.Println(first)
+	fmt.Println(second)
+}
+> 0
+1
+0
+1
+```
+
+* iota's can also be used in constant expressions. you can evolve the value of the constant in the constant block
+
+```
+package main
+
+import (
+	"fmt"
+)
+
+const( 
+first = iota + 6
+second
+)
+
+func main() {
+	fmt.Println(first)
+	fmt.Println(second)
+}
+> 6
+7
+```
+
+* families of constants can be grouped using multiple constant blocks.
+
+```
+package main
+
+import (
+	"fmt"
+)
+
+const( 
+first = iota + 6
+second
+)
+
+const (
+third = iota // here iota goes back to zero
+)
+
+func main() {
+	fmt.Println(first)
+	fmt.Println(second)
+	fmt.Println(third)
+}
+>0
+1
+0
 ```
