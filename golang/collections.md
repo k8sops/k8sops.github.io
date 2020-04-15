@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Introduction
+title: Collections
 category: golang
 permalink: /golang/collections
 chapter: 3
@@ -14,15 +14,14 @@ chapter: 3
 
 
 ## Arrays
+
 * Simple array declaration:
+
 ```
 package main
-
 import (
 	"fmt"
 )
-
-
 func main() {
 	var arr [3]int
 	arr[0]= 100
@@ -33,10 +32,10 @@ func main() {
 }
 > [100 300 500]
 500
-
 ```
 
 * ***Implicit*** Declaration:
+
 ```
 arr2 := [3]int{1,2,3}	
 fmt.Println(arr2)
@@ -70,13 +69,13 @@ func main() {
 ```
 
 * Adding to slice using ***append***
+
 ```
 package main
 
 import (
 	"fmt"
 )
-
 
 func main() {
 	
@@ -90,6 +89,7 @@ func main() {
 ``` 
 
 * Other uasage with colon operator:
+
 ```
 package main
 import (
