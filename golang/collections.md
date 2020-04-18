@@ -136,3 +136,58 @@ func main() {
 
 
 ### Struct
+* Only data type that allows to associate disparate data types together
+* Other collection types needs the data to be homogeneous.
+* with other data types we were able to declare and initialize at a time. With ***structs*** it is a two step process.
+
+```
+package main
+import (
+	"fmt"
+)
+func main() {
+	// declaration
+	type user struct {
+		id int
+		firstName string
+		lastName string
+	
+	}
+	
+	// initialization
+	var u user
+	fmt.Println(u)
+}
+> {0  } // output is a zero value
+```
+
+* since we didn't assign any values we got a zero value output. 0 -> int & empty spaces for firstName & lastName.
+
+```
+// assingning values now
+var u user
+u.id = 100
+u.firstName = "john"
+u.lastName = "doe"
+fmt.Println(u)
+> {100 jhon doe}
+```
+
+* Implicit initialization
+
+```
+u2 := user{ id : 10, firstName: "jhon", lastName: "doe"}
+fmt.Println(u2)
+```
+
+* Multi-line initilization
+
+```
+u2 := user{
+    id: 100,
+    firstName: "anirban",
+    lastName: "doe", // additional comma to keep the compiler happy with 
+    // line ending rules
+}
+
+```
