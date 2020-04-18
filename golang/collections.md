@@ -6,7 +6,7 @@ permalink: /golang/collections
 chapter: 3
 ---
 
-* Inbuilt types:
+* ***Inbuilt types***:
 1. Arrays: Fixed and indexed. And fixed type. All elements needs to be of same data type.
 2. slices: dynamic size, indexed
 3. Maps: Like slices but with key/value
@@ -115,3 +115,24 @@ func main() {
 ```
 
 ### Maps
+
+* Simple declaration:
+
+```
+package main
+import (
+	"fmt"
+)
+func main() {
+	m := map[string]int{"foo":25}
+	fmt.Println(m["foo"])
+	m["foo"] = 20	// re-assgining value to the key
+	fmt.Println(m["foo"])
+
+    delete(m, "foo") // deleting an element
+    fmt.Println(m)
+}
+```
+
+
+### Struct
