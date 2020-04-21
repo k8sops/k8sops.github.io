@@ -49,3 +49,29 @@ fi
 // see the difficulty???????????????
 ```
 
+## Declarative & Re-conciliation
+
+* Focusing on ***WHAT*** instead of ***HOW***
+
+![alt text](images/reconciliation.png "declarative")
+
+
+## Installing Ansible
+
+```
+pip install -U pip
+pip install ansible
+ansible --version
+
+pip list --outdated
+pip list --outdated --pre // releases like RC. not stable
+
+pip install -U ansible // upgrading
+```
+
+## Porting guides
+https://docs.ansible.com/ansible/latest/porting_guides/porting_guides.html
+
+## Ansible Architecture
+
+![alt text](images/ansible_architecture.png "ansible architecture")
