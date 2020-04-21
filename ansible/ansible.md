@@ -6,7 +6,7 @@ title: Ansible
 
 <ul>
 {% for page in sorted_pages %}
-    {% if page.category == "golang" %}
+    {% if page.category == "ansible" %}
         <li>Chap # {{ page.chapter }} - <a href="{{ page.url }}">{{ page.title }}</a></li><br/>
     {% endif %}
 {% endfor %}
