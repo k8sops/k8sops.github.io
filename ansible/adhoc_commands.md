@@ -70,8 +70,44 @@ pip install -U ansible // upgrading
 ```
 
 ## Porting guides
-https://docs.ansible.com/ansible/latest/porting_guides/porting_guides.html
+[porting docs](https://docs.ansible.com/ansible/latest/porting_guides/porting_guides.html)
 
 ## Ansible Architecture
 
 ![alt text](images/ansible_architecture.png "ansible architecture")
+
+* Most common communication between control node & managed nodes happen over ***SSH***
+
+But there are other options as well.
+
+```
+ansible-doc -t connection -l
+```
+
+![](images/different_managed_nodes.png "managed nodes")
+
+## Ansible Doc command
+
+```
+ansible-doc -t connection -l
+ansible-doc <plugin type flag> <name of plugin>  <list flag>
+```
+
+## Using Adhoc commands
+
+* Typing ansible tab, gives following commands
+
+```
+ansible tab
+ansible             ansible-connection  ansible-doc         ansible-inventory   ansible-pull        
+ansible-config      ansible-console     ansible-galaxy      ansible-playbook    ansible-vault
+```
+
+* Adhoc commands are for ***one off*** tasks.
+
+```
+ansible -h / --help
+```
+
+* Module Index
+[](https://docs.ansible.com/ansible/latest/modules/modules_by_category.html)
