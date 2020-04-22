@@ -18,3 +18,6 @@ chapter: 2
 
 2. Colon separated
 ![](images/colon_separated.png "colon separated")
+
+## Working with Playbooks
+["working with playbooks"](https://docs.ansible.com/ansible/latest/user_guide/playbooks.html)
