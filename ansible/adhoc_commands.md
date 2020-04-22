@@ -115,4 +115,73 @@ ansible -h / --help
 * Git config use case with Ansible
 
 ![](images/git_config.png "git config use case" ) 
-![](images/configuring_localhost.png "configguring localhost")
+![](images/configuring_localhost.png =500x500 "configguring localhost")
+
+* Copy Module
+
+```
+ansible -m copy -a "src=master.gitconfig dest=~/.gitconfig" localhost
+localhost | CHANGED => {
+    "changed": true,
+    "checksum": "d0220965edf7c588257bc8a1b0bfe5c6cf758ab5",
+    "dest": "/Users/someuser/.gitconfig",
+    "gid": 20,
+    "group": "staff",
+    "md5sum": "cd67fef27efe2ac03fe4a77ce48a0f0f",
+    "mode": "0644",
+    "owner": "someuser",
+    "size": 54,
+    "src": "/Users/someuser/.ansible/tmp/ansible-tmp-1587554263.341763-97437170343070/source",
+    "state": "file",
+    "uid": 501
+}
+```
+
+* Idempotence, with running the same command again
+
+```
+ansible -m copy -a "src=master.gitconfig dest=~/.gitconfig" localhost
+localhost | SUCCESS => {
+    "changed": false,
+    "checksum": "d0220965edf7c588257bc8a1b0bfe5c6cf758ab5",
+    "dest": "/Users/someuser/.gitconfig",
+    "gid": 20,
+    "group": "staff",
+    "mode": "0644",
+    "owner": "someuser",
+    "path": "/Users/someuser/.gitconfig",
+    "size": 54,
+    "state": "file",
+    "uid": 501
+}
+```
+
+* Incases of ***drift*** where the file is present but contents has changed.
+*** Ansible will correct it ****
+
+* Check flag ***--check***
+```
+ansible -m copy -a "src=master.gitconfig dest=~/.gitconfig" localhost --check
+localhost | CHANGED => {
+    "changed": true
+}
+```
+
+* Diff flag:
+
+```
+ansible -m copy -a "src=master.gitconfig dest=~/.gitconfig" localhost --diff
+--- before: /Users/someuser/.gitconfig
++++ after: /Users/someuser/Documents/source/ansible/someuser/master.gitconfig
+@@ -1,4 +1,4 @@
+ [user]
+-name = someuser123
++name = someuser
+ email = someuser@gmail.com
+```
+
+* Can use both to check if a change is made & what change.
+
+```
+ansible -m copy -a "src=master.gitconfig dest=~/.gitconfig" localhost --check --diff
+```
