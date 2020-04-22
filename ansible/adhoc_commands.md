@@ -111,3 +111,7 @@ ansible -h / --help
 
 * Module Index
 [](https://docs.ansible.com/ansible/latest/modules/modules_by_category.html)
+
+* Git config use case with Ansible
+
+![](images/git_config.png) ![](images/configuring_localhost.png)
