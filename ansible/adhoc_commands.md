@@ -114,4 +114,5 @@ ansible -h / --help
 
 * Git config use case with Ansible
 
-![](images/git_config.png) ![](images/configuring_localhost.png)
+![](images/git_config.png "git config use case" ) 
+![](images/configuring_localhost.png "configguring localhost")
