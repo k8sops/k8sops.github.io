@@ -14,10 +14,27 @@ chapter: 2
 ## Two styles to define Tasks
 
 1. Euqal To delimeted
-![](ansible/images/equal_separated.png "equal to separated")
+![](images/equal_separated.png "equal to separated")
 
 2. Colon separated
 ![](images/colon_separated.png "colon separated")
 
 ## Working with Playbooks
 ["working with playbooks"](https://docs.ansible.com/ansible/latest/user_guide/playbooks.html)
+
+![](images/analogy.png)
+
+* Playbooks comprises of plays.
+
+* Simple playbook for the .gitconfig usecase
+
+```
+---
+  # ansible -m copy -a "src=master.giconfig dest=~/.gitconfig"
+
+  - name: Ensure master.gitconfig file is present
+    hosts: localhost
+    tasks:
+      - copy: src="master.gitconfig" dest="~/.gitconfig"
+```
+
