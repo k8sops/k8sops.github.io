@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Minishift
-category: golang
+category: openshift
 permalink: /openshift/minishift
 chapter: 2
 ---

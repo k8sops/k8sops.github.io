@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Archirecture
-category: golang
+category: openshift
 permalink: /openshift/architecture
 chapter: 3
 ---

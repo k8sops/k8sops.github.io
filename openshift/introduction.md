@@ -13,3 +13,5 @@ chapter: 1
 ![](images/toolchain.png)
 
 ![](images/openshift_components.png)
+
+![](images/setup_options.png)
