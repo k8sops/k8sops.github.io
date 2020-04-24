@@ -81,3 +81,10 @@ ansible-playbook simple_playbook.yaml -v
 ansible-playbook simple_playbook.yaml -vv
 ansible-playbook simple_playbook.yaml -vvvv
 ```
+
+# Indentation
+* Tasks (using modules) are at level ***pink***
+* Arguments to these modules are at ***yellow***
+
+![](images/indentation.png)
+
