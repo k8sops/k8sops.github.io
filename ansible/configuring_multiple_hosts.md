@@ -39,6 +39,20 @@ ansible-inventory --graph
   |  |--@ubuntu:
   |  |  |--ubuntu10
   |  |  |--ubuntu11
+
+ansible-inventory --graph --vars // list out variables
+
+@all:
+  |--@ungrouped:
+  |  |--localhost
+  |  |  |--{ansible_connection = local}
+  |  |  |--{ansible_python_interpreter = /usr/local/bin/python3}
+  |--@vagrant:
+  |  |--@centos:
+  |  |  |--centos20
+  |  |  |  |--{ansible_host = 192.168.50.20}
+  |  |  |  |--{ansible_port = 22}
+  |  |  |  |--{ansible_private_key_file = .vagrant/machines/centos20/virtualbox/private_key}
 ```
 
 ```
@@ -122,3 +136,23 @@ Sample Playbook:
 ansible -m setup -a "filter=ansible_pkg_mgr" all
 ```
 
+## Troubleshooting Inventory scripts
+* If we have dynamic inventory, we can run the python script and very the output
+* Example:
+
+```
+python3 centos.py 
+{"_meta": {"hostvars": {"centos20": {"ansible_host": "192.168.50.20", "ansible_private_key_file": ".vagrant/machines/centos20/virtualbox/private_key"}, "centos21": {"ansible_host": "192.168.50.21", "ansible_private_key_file": ".vagrant/machines/centos21/virtualbox/private_key"}}}, "centos": {"hosts": ["centos20", "centos21"]}}
+```
+
+* For static inventory files we can use the ***graph** command and veiw the result.
+
+```
+ansible-inventory --graph --vars // list out variables
+```
+
+#### Listing all the types of inventory
+
+```
+ansible-doc -t inventory --list // about 31 of them using wc -l
+```
