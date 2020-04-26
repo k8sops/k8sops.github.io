@@ -16,7 +16,7 @@ ansible-doc -t connection --list
 [](https://github.com/ansible/ansible/blob/devel/lib/ansible/plugins/connection/local.py)
 
 
-* ***Docker Connection** Plugin:
+* ***Docker Connection*** Plugin:
 
 ```
 ansible-doc -t connection docker
@@ -51,4 +51,10 @@ ansible-doc -t connection docker
       state: absent 
     loop: "{{ query('inventory_hostnames', 'containers') }}"
 ```
+
+```
+ansible-console containers // containers is the group from inventory
+user@containers (3)[f:5]$ git_config list_all=yes scope=global
+```
+
 
