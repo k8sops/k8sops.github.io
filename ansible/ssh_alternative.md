@@ -55,6 +55,10 @@ ansible-doc -t connection docker
 ```
 ansible-console containers // containers is the group from inventory
 user@containers (3)[f:5]$ git_config list_all=yes scope=global
+
+Alternative to that would be:
+
+docker container exec -it ansible_container_test1 bash
 ```
 
 
