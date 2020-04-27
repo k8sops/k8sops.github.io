@@ -11,3 +11,8 @@ oc whoami -t
 [](https://www.katacoda.com/openshift)
 [](https://cloud.ibm.com/docs/openshift?topic=openshift-openshift_tutorial)
 [](https://learn.openshift.com/)
+
+[](https://www.openshift.com/blog/deploy-jenkins-pipelines-in-openshift-4-with-openshift-container-storage-4)
+
+[](https://github.com/red-hat-storage/ocs-training)
+
