@@ -66,3 +66,4 @@ git config --global user = someuser
 
 !["ansible pull"](images/ansible_pull.png)
 
+
