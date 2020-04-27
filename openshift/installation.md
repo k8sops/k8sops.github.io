@@ -7,3 +7,7 @@ oc whoami -t
 ```
 
 [](https://github.com/red-hat-storage/ocs-training)
+
+[](https://www.katacoda.com/openshift)
+[](https://cloud.ibm.com/docs/openshift?topic=openshift-openshift_tutorial)
+[](https://learn.openshift.com/)
