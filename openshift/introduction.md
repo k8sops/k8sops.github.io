@@ -46,4 +46,10 @@ oc adm policy add-cluster-role-to-user cluster-admin administrator
 
 2. S2I
 
-3. 
+3. Custom Build - Jenkins etc...
+
+![](images/intro/build_configuration.png)
+
+#### Image Streams:
+
+![](images/intro/image_stream.png)
