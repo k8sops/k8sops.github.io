@@ -1,3 +1,11 @@
+---
+layout: page
+title: Installation
+category: openshift
+permalink: /openshift/installation
+chapter: 0
+---
+
 ```
 oc login \
 --token=<secret> \
