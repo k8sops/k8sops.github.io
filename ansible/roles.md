@@ -17,4 +17,13 @@ Composing using roles & collections:
 
 ### Ansible Galaxy
 
+![](https://galaxy.ansible.com/search?keywords=git_config&order_by=-relevance&page=1&deprecated=false&type=collection)
+
+```
+ansible-galaxy -h
+ansible-galaxy role -h
+ansible-galaxy role search git_config
+ansible-galaxy collection -h
+```
+
 
