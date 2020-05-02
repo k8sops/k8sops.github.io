@@ -113,7 +113,7 @@ PORT=$(kubectl get svc go-demo-2-svc -ojsonpath="{.spec.ports[0].nodePort}")
 * The type of the Service is set to ***NodePort*** meaning that the ports will be available both within the cluster as well as from outside by sending requests to any of the nodes.
 * The ***ports*** section specifies that the requests should be forwarded to the Pods on port ***28017***. 
 * The ***nodePort*** is new. Instead of letting the service expose a random port, we set it to the explicit value of ***30001***. Even though, in most cases, that ***is not a good practice**, we are doing it for demonstration purposes. 
-* The protocol is set to ***TCP***. The only other alternative would be to use UDP. TCP is default. Cloud have skipped declaring.
+* The protocol is set to ***TCP***. The only other alternative would be to use UDP. TCP is default. could have skipped declaring.
 * The ***selector*** is used by the Service to know which Pods should receive requests. It works in the same way as ReplicaSet selectors. In this case, we defined that the service should forward requeststo Pods with labels typeset to backend and service set to go-demo. Those two labels are set in the Pods spec of the ReplicaSet.
 
 * Now creating the service:

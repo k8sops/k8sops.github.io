@@ -140,6 +140,7 @@ spec:
   replicas: 4
 ```
 * Testing self healing:
+
 ```
 POD_NAME=$(kubectl get pods -o name | tail -1)
 
@@ -156,6 +157,7 @@ go-demo-2-vgkwj   2/2     Running   0          16s     db=mongo,language=go,serv
 ```
 
 * Lets verify the importance of ***labels*** Let’s see what happens if we remove one of the Pod labels ReplicaSet uses in its selector.
+
 ```
 POD_NAME=$(kubectl get pods -o name | tail -1)
 kubectl label $POD_NAME service -
@@ -174,10 +176,13 @@ go-demo-2-c4ccl   2/2     Running   0          20m     db=mongo,language=go,serv
 go-demo-2-f5dvh   2/2     Running   0          20m     db=mongo,language=go,service=go-demo-2,type=backend
 go-demo-2-j2x8b   2/2     Running   0          2m25s   db=mongo,language=go,service=go-demo-2,type=backend
 go-demo-2-vgkwj   2/2     Running   0          6m53s   db=mongo,language=go,type=backend
+
 ```
 
 * Notice service label has been removed. And how an New Pod was spun up. Since ReplicaSet found a missing Pod (becoz of no label match), it created one.
+
 * If we add back the label. Rs would remove the extra Pod.
+
 ```
 kubectl label $POD_NAME service=go-demo-2
 pod/go-demo-2-vgkwj labeled
@@ -189,5 +194,7 @@ go-demo-2-c4ccl   2/2     Running   0          24m   db=mongo,language=go,servic
 go-demo-2-f5dvh   2/2     Running   0          24m   db=mongo,language=go,service=go-demo-2,type=backend
 go-demo-2-vgkwj   2/2     Running   0          10m   db=mongo,language=go,service=go-demo-2,type=backend
 ```
+
 * count is now back to 4.
+
 * ***ReplicaSets*** are almost never used by themselves. Just as we don't create Pods directly. Instead, we tend to create ReplicaSets through Deployments. In other words, we use ReplicaSets to create and control Pods, and Deployments to create ReplicaSets (and a few other things).
